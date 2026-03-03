@@ -9,7 +9,7 @@ import { useState } from 'react';
 const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/projects', icon: FolderOpen, label: 'Projects' },
-    { to: '/scans', icon: Scan, label: 'Scans' },
+    { to: '/scan/1', icon: Scan, label: 'Scans' },
     { to: '/schedule', icon: CalendarClock, label: 'Schedule' },
     { to: '/notifications', icon: Bell, label: 'Notifications' },
     { to: '/settings', icon: Settings, label: 'Settings' },
