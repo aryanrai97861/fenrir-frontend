@@ -897,11 +897,48 @@ input {
   margin-top: 2px;
 }
 
+/* Info Bar */
+.dash-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.info-val {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.info-sep {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+}
+
+/* Severity Cards */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
@@ -925,24 +962,35 @@ input {
   margin-bottom: 10px;
 }
 
+.stat-sev-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stat-sev-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .stat-trend {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
+  gap: 3px;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
 }
 
 .stat-trend.up {
   color: #4ADE80;
-  background: rgba(74, 222, 128, 0.1);
 }
 
 .stat-trend.down {
   color: #FF4D4D;
-  background: rgba(255, 77, 77, 0.1);
 }
 
 .stat-count {
@@ -954,7 +1002,54 @@ input {
 
 .stat-desc {
   color: var(--text-tertiary);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Pagination */
+.table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pagination-info {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.pagination-btn {
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  background: var(--bg-surface-2);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Failed progress bar */
+.progress-bar-failed {
+  background: #FF4D4D !important;
 }
 
 /* Table Toolbar */

@@ -4,8 +4,25 @@ import Sidebar from '../components/Sidebar';
 import SeverityBadge from '../components/SeverityBadge';
 import StatusChip from '../components/StatusChip';
 import { useToast } from '../context/ToastContext';
-import { scans, severityStats } from '../data/mockData';
-import { TrendingUp, TrendingDown, Search, SlidersHorizontal, Columns3, Plus, Download } from 'lucide-react';
+import { scans, severityStats, statusBarData } from '../data/mockData';
+import {
+    TrendingUp, TrendingDown, Search, SlidersHorizontal, Columns3, Plus,
+    ShieldAlert, AlertTriangle, AlertCircle, Search as SearchIcon, Clock, ChevronLeft, ChevronRight,
+} from 'lucide-react';
+
+const sevIcons: Record<string, typeof ShieldAlert> = {
+    critical: ShieldAlert,
+    high: AlertTriangle,
+    medium: AlertCircle,
+    low: SearchIcon,
+};
+
+const sevColors: Record<string, string> = {
+    critical: '#FF4D4D',
+    high: '#FF6B35',
+    medium: '#FFB800',
+    low: '#3B82F6',
+};
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -14,6 +31,8 @@ export default function Dashboard() {
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15;
 
     useState(() => {
         const timer = setTimeout(() => setLoading(false), 800);
@@ -29,45 +48,87 @@ export default function Dashboard() {
         });
     }, [searchQuery, filterStatus]);
 
+    const totalScans = 100;
+    const totalPages = Math.ceil(totalScans / itemsPerPage);
+
     const statEntries = Object.entries(severityStats) as [string, typeof severityStats.critical][];
 
     return (
         <div className="app-layout">
             <Sidebar />
             <main className="main-content" role="main">
-                <div className="dashboard-header">
-                    <div>
-                        <h1>Dashboard</h1>
-                        <p className="header-subtitle">Monitor your security scans and vulnerabilities</p>
+                {/* Breadcrumb Header */}
+                <div className="scan-detail-header">
+                    <div className="scan-breadcrumb">
+                        <span className="breadcrumb-main">Scan</span>
+                        <span className="breadcrumb-sep">⚙</span>
+                        <span className="breadcrumb-sep">/</span>
+                        <span className="breadcrumb-item">Private Assets</span>
+                        <span className="breadcrumb-sep">/</span>
+                        <span className="breadcrumb-new">New Scan</span>
                     </div>
-                    <button className="btn-export" onClick={() => showToast('Report exported successfully', 'success')} aria-label="Export report">
-                        <Download size={16} />
-                        Export Report
-                    </button>
+                    <div className="scan-detail-actions">
+                        <button className="btn-export" onClick={() => showToast('Report exported', 'success')}>
+                            Export Report
+                        </button>
+                        <button className="btn-stop-scan" onClick={() => showToast('Scan stopped', 'error')}>
+                            Stop Scan
+                        </button>
+                    </div>
                 </div>
 
+                {/* Info Bar */}
+                <div className="dash-info-bar">
+                    <div className="info-item"><span className="info-label">Org:</span> <span className="info-val">Project X</span></div>
+                    <div className="info-sep">|</div>
+                    <div className="info-item"><span className="info-label">Owner:</span> <span className="info-val">Nammagiri</span></div>
+                    <div className="info-sep">|</div>
+                    <div className="info-item"><span className="info-label">Total Scans:</span> <span className="info-val">100</span></div>
+                    <div className="info-sep">|</div>
+                    <div className="info-item"><span className="info-label">Scheduled:</span> <span className="info-val">1000</span></div>
+                    <div className="info-sep">|</div>
+                    <div className="info-item"><span className="info-label">Rescans:</span> <span className="info-val">100</span></div>
+                    <div className="info-sep">|</div>
+                    <div className="info-item"><span className="info-label">Failed Scans:</span> <span className="info-val">100</span></div>
+                    <div className="info-item" style={{ marginLeft: 'auto' }}>
+                        <Clock size={14} style={{ color: 'var(--text-tertiary)' }} />
+                        <span className="info-val">10 mins ago</span>
+                    </div>
+                </div>
+
+                {/* Severity Cards */}
                 <div className="stats-grid" role="region" aria-label="Severity statistics">
-                    {statEntries.map(([key, stat]) => (
-                        <div key={key} className={`stat-card stat-${key}`}>
-                            {loading ? (
-                                <div className="skeleton-stat" />
-                            ) : (
-                                <>
-                                    <div className="stat-header">
-                                        <SeverityBadge severity={stat.label as any} showLabel />
-                                        <span className={`stat-trend ${stat.change >= 0 ? 'up' : 'down'}`}>
-                                            {stat.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                            {Math.abs(stat.change)}%
-                                        </span>
-                                    </div>
-                                    <div className="stat-count">{stat.count}</div>
-                                    <p className="stat-desc">{stat.change >= 0 ? '+' : ''}{stat.change}% increase than yesterday</p>
-                                </>
-                            )}
-                        </div>
-                    ))}
+                    {statEntries.map(([key, stat]) => {
+                        const SevIcon = sevIcons[key];
+                        const color = sevColors[key];
+                        return (
+                            <div key={key} className={`stat-card stat-${key}`}>
+                                {loading ? (
+                                    <div className="skeleton-stat" />
+                                ) : (
+                                    <>
+                                        <div className="stat-header">
+                                            <span className="stat-sev-title">{stat.label} Severity</span>
+                                            <div className="stat-sev-icon" style={{ background: `${color}20`, color }}>
+                                                <SevIcon size={18} />
+                                            </div>
+                                        </div>
+                                        <div className="stat-count" style={{ color }}>{stat.count}</div>
+                                        <p className="stat-desc">
+                                            <span className={`stat-trend ${stat.change >= 0 ? 'up' : 'down'}`}>
+                                                {stat.change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                                                {stat.change >= 0 ? '+' : ''}{stat.change}%
+                                            </span>
+                                            {stat.change >= 0 ? ' increase' : ' decrease'} from yesterday
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
 
+                {/* Search & Filter Toolbar */}
                 <div className="table-toolbar">
                     <div className="search-wrapper">
                         <Search size={16} className="search-icon" />
@@ -103,11 +164,12 @@ export default function Dashboard() {
                             <Columns3 size={16} /> Column
                         </button>
                         <button className="btn-primary" onClick={() => showToast('New scan initiated!', 'success')} aria-label="Start new scan">
-                            <Plus size={16} /> New Scan
+                            <Plus size={16} /> New scan
                         </button>
                     </div>
                 </div>
 
+                {/* Scan Table */}
                 <div className="table-container" role="region" aria-label="Scan results">
                     <table className="scan-table" aria-label="Scans table">
                         <thead>
@@ -116,7 +178,7 @@ export default function Dashboard() {
                                 <th>Type</th>
                                 <th>Status</th>
                                 <th>Progress</th>
-                                <th>Vulnerabilities</th>
+                                <th>Vulnerability</th>
                                 <th>Last Scan</th>
                             </tr>
                         </thead>
@@ -150,7 +212,7 @@ export default function Dashboard() {
                                             <div className="progress-cell">
                                                 <div className="progress-bar-bg">
                                                     <div
-                                                        className="progress-bar-fill"
+                                                        className={`progress-bar-fill ${scan.status === 'Failed' ? 'progress-bar-failed' : ''}`}
                                                         style={{ width: `${scan.progress}%` }}
                                                     />
                                                 </div>
@@ -175,6 +237,64 @@ export default function Dashboard() {
                             )}
                         </tbody>
                     </table>
+
+                    {/* Pagination */}
+                    <div className="table-pagination">
+                        <span className="pagination-info">Showing {filteredScans.length} of {totalScans} Scans</span>
+                        <div className="pagination-controls">
+                            <button
+                                className="pagination-btn"
+                                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                disabled={currentPage === 1}
+                            >
+                                <ChevronLeft size={16} />
+                            </button>
+                            <button
+                                className="pagination-btn"
+                                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                disabled={currentPage === totalPages}
+                            >
+                                <ChevronRight size={16} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Status Bar */}
+                <div className="status-bar" role="status">
+                    <div className="status-user">
+                        <div className="status-user-avatar">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="User" width="28" height="28" style={{ borderRadius: '50%' }} />
+                        </div>
+                        <div className="status-user-info">
+                            <span className="status-user-email">{statusBarData.userEmail}</span>
+                            <span className="status-user-role">{statusBarData.userRole}</span>
+                        </div>
+                    </div>
+                    <div className="status-divider" />
+                    <div className="status-items">
+                        <div className="status-item">
+                            <span className="status-label">Sub-Agents</span>
+                            <span className="status-value">{statusBarData.subAgents}</span>
+                        </div>
+                        <span className="status-dot">•</span>
+                        <div className="status-item">
+                            <span className="status-label">Parallel Executions</span>
+                            <span className="status-value">{statusBarData.parallelExecutions}</span>
+                        </div>
+                        <span className="status-dot">•</span>
+                        <div className="status-item">
+                            <span className="status-label">Operations</span>
+                            <span className="status-value">{statusBarData.operations}</span>
+                        </div>
+                    </div>
+                    <div className="status-divider" />
+                    <div className="status-severity">
+                        <span className="sev-label" style={{ color: '#FF4D4D' }}>Critical:</span> <span className="sev-count critical">{statusBarData.critical}</span>
+                        <span className="sev-label" style={{ color: '#FF6B35' }}>High:</span> <span className="sev-count high">{statusBarData.high}</span>
+                        <span className="sev-label" style={{ color: '#FFB800' }}>Medium:</span> <span className="sev-count medium">{statusBarData.medium}</span>
+                        <span className="sev-label" style={{ color: '#4ADE80' }}>Low:</span> <span className="sev-count low">{statusBarData.low}</span>
+                    </div>
                 </div>
             </main>
         </div>
