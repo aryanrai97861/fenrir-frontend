@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import SeverityBadge from '../components/SeverityBadge';
@@ -72,7 +72,7 @@ export default function ScanDetail() {
         if (!entry.highlights?.length) return <span>{entry.message}</span>;
 
         let msg = entry.message;
-        const parts: (string | JSX.Element)[] = [];
+        const parts: (string | React.ReactNode)[] = [];
         let lastIdx = 0;
 
         const sortedHighlights = [...entry.highlights].sort((a, b) => msg.indexOf(a.text) - msg.indexOf(b.text));
