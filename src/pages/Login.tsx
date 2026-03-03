@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
-import { Eye, EyeOff, Check, Sun, Moon } from 'lucide-react';
+import { Eye, EyeOff, Check } from 'lucide-react';
 
 export default function Login() {
     const navigate = useNavigate();
-    const { theme, toggleTheme } = useTheme();
+
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
@@ -34,9 +33,7 @@ export default function Login() {
                 <div className="login-glow login-glow-3" />
             </div>
 
-            <button className="login-theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+
 
             <div className="login-content">
                 {/* Left branding */}
